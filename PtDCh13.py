@@ -1,4 +1,5 @@
 from math import sin
+import numpy as np
 
 # ------------------------
 # CHAPTER 13
@@ -24,11 +25,12 @@ def delta(pd, vd):
 
 
 def delta1(delta, alpha=0):
+    """Calculates the delta1 value depending on the density of the spoil"""
 
     if delta < 1.4:
         return delta
     if delta >= 1.4:
-        return delta + (1.4 - delta) * sin(alpha) ** 2
+        return delta + (1.4 - delta) * sin(np.radians(alpha)) ** 2
 
 
 def still_water_pressure_hopper_well(dd, delta1, g=9.81):
@@ -81,6 +83,3 @@ def inertia_pressure_hopper_well():
     if loadcase == 'd':
         #to be calulated
         pass
-
-
-

@@ -9,7 +9,7 @@ from math import sqrt, exp, pi
 # ------------------------
 
 
-def navigationcoefficients (coefficient, navigationnotation):
+def navigation_coefficients (coefficient, navigation_notation):
     """Calculates the navigation coefficients n and n1 as per NR467 BV,PtB,Ch5,Sec1
 
        Input:
@@ -23,10 +23,10 @@ def navigationcoefficients (coefficient, navigationnotation):
 
     if coefficient == 'n':
         dict = {'unrestricted navigation': 1, 'summer zone': 0.9, 'tropical zone': 0.8, 'coastal zone': 0.8, 'sheltered area': 0.65}
-        return dict[navigationnotation]
+        return dict[navigation_notation]
     if coefficient == 'n1':
         dict = {'unrestricted navigation': 1, 'summer zone': 0.95, 'tropical zone': 0.9, 'coastal zone': 0.9, 'sheltered area': 0.8}
-        return dict[navigationnotation]
+        return dict[navigation_notation]
 
 # ------------------------
 # Section 2
@@ -61,7 +61,7 @@ def waveparameterh(L):
 # ------------------------
 
 
-def shiprelativemotionupright(x, cb, n, C, L, T, D, t1):
+def ship_relative_motion_upright(x, cb, n, C, L, T, D, t1):
 
     """Calculates the reference value h1
     of the relative motion according to NR467 BV,PtB,Ch5,Sec3,[3.3]
@@ -104,7 +104,7 @@ def shiprelativemotionupright(x, cb, n, C, L, T, D, t1):
 # ------------------------
 
 
-def seastillwaterpressure(z, t1, rho=1.025, g=9.81):
+def sea_still_water_pressure(z, t1, rho=1.025, g=9.81):
 
     """Calculates the still water  sea pressure as per NR467 BV,PtB,Ch5,Sec5,[1]
 
@@ -125,7 +125,7 @@ def seastillwaterpressure(z, t1, rho=1.025, g=9.81):
         return 0
 
 
-def seawavepressuresidesandbottom(z, t1, loadcase, h1, L, D, rho=1.025, g=9.81):
+def sea_wave_pressure_sides_and_bottom(z, t1, loadcase, h1, L, D, rho=1.025, g=9.81):
 
     """ Calculates the wave sea pressure on bottom and sides according to NR467 BV,PtB,Ch5,Sec5,[2]
 
@@ -144,9 +144,9 @@ def seawavepressuresidesandbottom(z, t1, loadcase, h1, L, D, rho=1.025, g=9.81):
     pw: sea wave pressure in [kN/m^2]
     """
 
-    cf1 = cf1combinationfactor(loadcase)
+    cf1 = cf1_combination_factor(loadcase)
     phi1 = 1
-    phi2 = phi2coefficient(L)
+    phi2 = phi2_coefficient(L)
 
     if loadcase == 'a+':
         if z <= t1:
@@ -165,16 +165,16 @@ def seawavepressuresidesandbottom(z, t1, loadcase, h1, L, D, rho=1.025, g=9.81):
         if z <= t1:
             return rho * g * cf1 *h1 * exp((-2 * pi * (t1 - z) / L))
         if t1 < z <= D:
-            limit = 0.15 * phi1 * phi2coefficient(L) * L
+            limit = 0.15 * phi1 * phi2_coefficient(L) * L
             return max(rho * g * (t1 + h1 - z), limit)
 
 
-def seastillwaterpressureexposeddecks(L):
+def sea_still_water_pressure_exposed_decks(L):
     phi1 = 1
-    phi2 = phi2coefficient(L)
+    phi2 = phi2_coefficient(L)
     return 10 * phi1 * phi2
 
-def seawavepressureexposeddecks(x, z, t1, loadcase, L, n, cb, servicespeed = 13):
+def sea_wave_pressure_exposed_decks(x, z, t1, loadcase, L, n, cb, servicespeed = 13):
 
     """ Calculates the wave sea pressure on exposed deck according to NR467 BV,PtB,Ch5,Sec5,[Tab4]
 
@@ -196,24 +196,24 @@ def seawavepressureexposeddecks(x, z, t1, loadcase, L, n, cb, servicespeed = 13)
     """
 
     phi1 = 1
-    phi2 = phi2coefficient(L)
+    phi2 = phi2_coefficient(L)
     v = max(servicespeed, 13)
 
     if loadcase == 'a+' or loadcase == 'b':
         if 0 <= x <= 0.5 * L:
             return 17.5 * n * phi1 * phi2
         if 0.5 * L < x < 0.75 * L:
-            hf = hformula(0.75 * L, L, v, cb, z, t1, loadcase)
+            hf = h_formula(0.75 * L, L, v, cb, z, t1, loadcase)
             return (17.5 + ((19.6 * sqrt(hf) - 17.5) / 0.25) * ((x / L) - 0.5))* n * phi1 * phi2
         if 0.75 * L <= x <= L:
-            h = hformula(x, L, v, cb, z, t1, loadcase)
+            h = h_formula(x, L, v, cb, z, t1, loadcase)
             return 19.6 * n * phi1 * phi2 * sqrt(h)
 
     if loadcase == 'a-':
         return 0
 
 
-def phi2coefficient(L):
+def phi2_coefficient(L):
     """ Calculates the phi 2 coefficient, used for the calculation of the wave pressure NR467 BV,PtB,Ch5,Sec5,[Tab4]
 
         Input
@@ -231,20 +231,12 @@ def phi2coefficient(L):
         return 1
 
 
-def cf1combinationfactor(loadcase):
+def cf1_combination_factor(loadcase):
     if loadcase == 'a+' or loadcase == 'a-':
         return 1
     if loadcase == 'b':
         return 0.5
 
 
-def hformula(x, L, v, cb, z, t1, loadcase):
-    return max (cf1combinationfactor(loadcase) *  ((2.66 * ((x / L) - 0.7) ** 2 ) + 0.14) * sqrt((v * L ) / cb) - (z - t1), 0.8)
-
-
-
-
-
-
-
-
+def h_formula(x, L, v, cb, z, t1, loadcase):
+    return max (cf1_combination_factor(loadcase) *  ((2.66 * ((x / L) - 0.7) ** 2 ) + 0.14) * sqrt((v * L ) / cb) - (z - t1), 0.8)
